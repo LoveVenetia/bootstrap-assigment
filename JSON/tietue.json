@@ -1,1 +1,28 @@
-
+{
+  "otsikko": "JSON-datan käsittelyä",
+  "kuvaus": "Tämä sivu hakee JSON-tietueen ja muuntaa sen JavaScript-olioksi Fetch API:n avulla.",
+  "kuva": "https://jaakkola.github.io/json/digi.JPG",
+  "opintojakso": {
+    "nimi": "Digitekniikat",
+    "tunnus": "DIGI001",
+    "opintopisteet": 5
+  },
+  "tekniikat": [
+    {
+      "aihe": "low-code",
+      "linkki": "https://en.wikipedia.org/wiki/Low-code_development_platform"
+    },
+    {
+      "aihe": "sisällönhallintajärjestelmät",
+      "linkki": "https://en.wikipedia.org/wiki/Content_management_system"
+    },
+    {
+      "aihe": "responsiivinen käyttöliittymä ja komponentit",
+      "linkki": "https://getbootstrap.com/"
+    },
+    {
+      "aihe": "tiedon haku julkisista palveluista REST-rajapinnan yli",
+      "linkki": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"
+    }
+  ]
+}
