@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toteutus</title>
+</head>
+<body>
+
+  <h1>Toteutus</h1>
+  <div id="vastaus"></div>
+
+  <script>
+    fetch("toteutus.json")
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        tulosta(data);
+      })
+      .catch(function () {
+        document.getElementById("vastaus").innerHTML = "<p>Tietoa ei pystytä hakemaan</p>";
+      });
+
+    function tulosta(obj) {
+      let html = "";
+      html += "<h2>" + obj.toteutus + "</h2>";
+      html += "<p>Osallistujien lukumäärä: " + obj.osallistujamaara + "</p>";
+      html += "<p>Alku: " + obj.alku + " | Loppu: " + obj.loppu + "</p>";
+      html += "<p>Kesto: " + obj.kesto_viikkoina + " viikkoa</p>";
+      html += "<p><img src='" + obj.kuva + "' width='300' alt='Kuva'></p>";
+      html += "<h3>Osallistujat</h3><ul>";
+
+      for (var i = 0; i < obj.osallistujat.length; i++) {
+        html += "<li>" + obj.osallistujat[i] + "</li>";
+      }
+
+      html += "</ul>";
+      document.getElementById("vastaus").innerHTML = html;
+    }
+  </script>
+
+</body>
+</html>
