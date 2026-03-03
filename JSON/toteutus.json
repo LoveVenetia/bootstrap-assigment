@@ -1,0 +1,9 @@
+{
+  "toteutus": "Digitekniikat",
+  "osallistujamaara": 5,
+  "osallistujat": ["Aino", "Eero", "Mika", "Sofia", "Noah"],
+  "alku": "13.1.2025",
+  "loppu": "14.3.2025",
+  "kesto_viikkoina": 8,
+  "kuva": "https://jaakkola.github.io/json/digi.JPG"
+}
