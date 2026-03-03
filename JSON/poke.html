@@ -1,122 +1,112 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pokemon haku</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poke Haku</title>
 </head>
 <body>
 
-  <h1>Pokemon haku</h1>
+<h1>Pokemon haku</h1>
 
-  <p>
-    <input type="text" id="pokemonName" placeholder="Enter Pokemon name">
-    <button id="haeBtn" onclick="poke()">Hae</button><br>
-    <div id="nimi">Kirjoita laatikkoon Pokemonin nimi</div>
-    <p id="kuva2"></p>
-    <div id="kaannaAlue"></div>
-    <div id="ominaisuudet"></div>
-    <div id="vastaus"></div>
-  </p>
+<input type="text" id="pokemonName" placeholder="Enter Pokemon name">
+<button onclick="poke()">Hae</button>
 
-  <script>
-    let lastData = null;
-    let name = "";
+<h2 id="nimi"></h2>
+<div id="kuva2"></div>
+<div id="kaannaAlue"></div>
+<div id="ominaisuudet"></div>
+<div id="vastaus"></div>
 
-    function poke() {
-      const pokeName = document.getElementById("pokemonName").value.toLowerCase().trim();
-      name = document.getElementById("pokemonName").value.trim();
+<script>
 
-      document.getElementById("vastaus").innerHTML = "";
-      document.getElementById("ominaisuudet").innerHTML = "";
+let lastData = null;
+let isBack = false;
 
-      if (!pokeName) {
-        document.getElementById("nimi").innerHTML = "Kirjoita laatikkoon Pokemonin nimi";
-        document.getElementById("kuva2").innerHTML = "";
-        document.getElementById("kaannaAlue").innerHTML = "";
-        lastData = null;
-        return;
+function poke() {
+
+  const pokeName = document.getElementById("pokemonName").value.toLowerCase().trim();
+
+  document.getElementById("nimi").innerHTML = "";
+  document.getElementById("kuva2").innerHTML = "";
+  document.getElementById("kaannaAlue").innerHTML = "";
+  document.getElementById("ominaisuudet").innerHTML = "";
+  document.getElementById("vastaus").innerHTML = "";
+
+  if (!pokeName) {
+    document.getElementById("vastaus").innerHTML = "Kirjoita Pokemonin nimi";
+    return;
+  }
+
+  fetch("https://pokeapi.co/api/v2/pokemon/" + pokeName)
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error("Not found");
       }
+      return response.json();
+    })
+    .then(function(data) {
+      lastData = data;
+      isBack = false;
+      naytaFront(data);
+    })
+    .catch(function() {
+      lastData = null;
+      document.getElementById("vastaus").innerHTML = "Pokemon ei löytynyt";
+    });
 
-      fetch(`https://pokeapi.co/api/v2/pokemon/${pokeName}`)
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error("Not found");
-          }
-          return response.json();
-        })
-        .then(function (responseJson) {
-          lastData = responseJson;
-          pokekuva(responseJson);
-        })
-        .catch(function (error) {
-          lastData = null;
-          document.getElementById("kuva2").innerHTML = "";
-          document.getElementById("kaannaAlue").innerHTML = "";
-          document.getElementById("nimi").innerHTML = "Pokemon ei löytynyt";
-          document.getElementById("vastaus").innerHTML = "<p>Tietoa ei pystytä hakemaan</p>";
-          document.getElementById("pokemonName").value = "";
-        });
-    }
+  document.getElementById("pokemonName").value = "";
+}
 
-    function pokekuva(obj) {
-      const pokeurl = obj.sprites.front_default;
+function naytaFront(obj) {
 
-      if (!pokeurl) {
-        document.getElementById("kuva2").innerHTML = "";
-        document.getElementById("nimi").innerHTML = "<b>" + name + "</b>";
-        document.getElementById("kaannaAlue").innerHTML = "";
-        document.getElementById("vastaus").innerHTML = "<p>Kuvaa ei löytynyt tälle Pokemonille</p>";
-        document.getElementById("pokemonName").value = "";
-        return;
-      }
+  document.getElementById("nimi").innerHTML = obj.name;
+  document.getElementById("kuva2").innerHTML =
+    "<img src='" + obj.sprites.front_default + "' alt='pokemon'>";
+  
+  document.getElementById("kaannaAlue").innerHTML =
+    "<button onclick='kaanna()'>Käännä</button>";
+}
 
-      document.getElementById("kuva2").innerHTML = "<img src='" + pokeurl + "' alt='Pokemon'>";
-      document.getElementById("nimi").innerHTML = "<b>" + name + "</b>";
-      document.getElementById("kaannaAlue").innerHTML = "<button onclick='kaanna()'>Käännä</button>";
-      document.getElementById("pokemonName").value = "";
-    }
+function kaanna() {
 
-    function kaanna() {
-      document.getElementById("vastaus").innerHTML = "";
+  if (!lastData) {
+    document.getElementById("vastaus").innerHTML = "Tietoa ei pystytä hakemaan";
+    return;
+  }
 
-      if (!lastData) {
-        document.getElementById("vastaus").innerHTML = "<p>Tietoa ei pystytä hakemaan</p>";
-        return;
-      }
+  const front = lastData.sprites.front_default;
+  const back = lastData.sprites.back_default;
 
-      const backUrl = lastData.sprites.back_default;
+  isBack = !isBack;
 
-      if (!backUrl) {
-        document.getElementById("vastaus").innerHTML = "<p>Selkäkuvaa ei löytynyt tälle Pokemonille</p>";
-        return;
-      }
+  const kuva = isBack ? back : front;
 
-      document.getElementById("kuva2").innerHTML = "<img src='" + backUrl + "' alt='Pokemon selin'>";
+  if (!kuva) {
+    document.getElementById("vastaus").innerHTML = "Kuvaa ei löytynyt";
+    isBack = !isBack;
+    return;
+  }
 
-      const height = lastData.height;
-      const weight = lastData.weight;
-      const baseExp = lastData.base_experience;
+  document.getElementById("kuva2").innerHTML =
+    "<img src='" + kuva + "' alt='pokemon'>";
 
-      let types = "";
-      if (lastData.types && lastData.types.length > 0) {
-        for (var i = 0; i < lastData.types.length; i++) {
-          types += lastData.types[i].type.name;
-          if (i < lastData.types.length - 1) types += ", ";
-        }
-      } else {
-        types = "-";
-      }
+  let types = "";
+  for (var i = 0; i < lastData.types.length; i++) {
+    types += lastData.types[i].type.name;
+    if (i < lastData.types.length - 1) types += ", ";
+  }
 
-      let out = "<h3>Ominaisuudet</h3>";
-      out += "<p><b>Tyyppi</b>: " + types + "</p>";
-      out += "<p><b>Pituus</b>: " + height + "</p>";
-      out += "<p><b>Paino</b>: " + weight + "</p>";
-      out += "<p><b>Base experience</b>: " + baseExp + "</p>";
+  let html = "<h3>Ominaisuudet</h3>";
+  html += "<p>Tyyppi: " + types + "</p>";
+  html += "<p>Pituus: " + lastData.height + "</p>";
+  html += "<p>Paino: " + lastData.weight + "</p>";
+  html += "<p>Base experience: " + lastData.base_experience + "</p>";
 
-      document.getElementById("ominaisuudet").innerHTML = out;
-    }
-  </script>
+  document.getElementById("ominaisuudet").innerHTML = html;
+}
+
+</script>
 
 </body>
 </html>
