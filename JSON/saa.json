@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sää Helsingissä</title>
+</head>
+<body>
+
+<h1>Sää Helsingissä</h1>
+
+<div id="aika"></div>
+<div id="saa"></div>
+<div id="lampotila"></div>
+<div id="tuuli"></div>
+<div id="kuva"></div>
+<div id="virhe"></div>
+
+<script>
+
+window.onload = function() {
+
+  const nyt = new Date();
+  const tunnit = nyt.getHours().toString().padStart(2, "0");
+  const minuutit = nyt.getMinutes().toString().padStart(2, "0");
+  document.getElementById("aika").innerHTML = "Sää kello " + tunnit + ":" + minuutit;
+
+  fetch("https://api.openweathermap.org/data/2.5/weather?id=658225&appid=665ecd56dfc08dbb50feb8b8f5034e28&lang=fi&units=metric")
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error("Virhe haussa");
+      }
+      return response.json();
+    })
+    .then(function(data) {
+      naytaSaa(data);
+    })
+    .catch(function() {
+      document.getElementById("virhe").innerHTML = "Tietoa ei pystytä hakemaan";
+    });
+};
+
+function naytaSaa(data) {
+
+  const saa = data.weather[0].description;
+  const lampo = data.main.temp;
+  const tuuli = data.wind.speed;
+  const icon = data.weather[0].icon;
+
+  document.getElementById("saa").innerHTML = "<h3>Sää:</h3><p>" + saa + "</p>";
+  document.getElementById("lampotila").innerHTML = "<h3>Lämpötila:</h3><p>" + lampo + " °C</p>";
+  document.getElementById("tuuli").innerHTML = "<h3>Tuuli:</h3><p>" + tuuli + " m/s</p>";
+  document.getElementById("kuva").innerHTML =
+    "<img src='https://openweathermap.org/img/wn/" + icon + "@2x.png' alt='sääkuva'>";
+}
+
+</script>
+
+</body>
+</html>
