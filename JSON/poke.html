@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokemon haku</title>
+</head>
+<body>
+
+  <h1>Pokemon haku</h1>
+
+  <p>
+    <input type="text" id="pokemonName" placeholder="Enter Pokemon name">
+    <button id="haeBtn" onclick="poke()">Hae</button><br>
+    <div id="nimi">Kirjoita laatikkoon Pokemonin nimi</div>
+    <p id="kuva2"></p>
+    <div id="kaannaAlue"></div>
+    <div id="ominaisuudet"></div>
+    <div id="vastaus"></div>
+  </p>
+
+  <script>
+    let lastData = null;
+    let name = "";
+
+    function poke() {
+      const pokeName = document.getElementById("pokemonName").value.toLowerCase().trim();
+      name = document.getElementById("pokemonName").value.trim();
+
+      document.getElementById("vastaus").innerHTML = "";
+      document.getElementById("ominaisuudet").innerHTML = "";
+
+      if (!pokeName) {
+        document.getElementById("nimi").innerHTML = "Kirjoita laatikkoon Pokemonin nimi";
+        document.getElementById("kuva2").innerHTML = "";
+        document.getElementById("kaannaAlue").innerHTML = "";
+        lastData = null;
+        return;
+      }
+
+      fetch(`https://pokeapi.co/api/v2/pokemon/${pokeName}`)
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Not found");
+          }
+          return response.json();
+        })
+        .then(function (responseJson) {
+          lastData = responseJson;
+          pokekuva(responseJson);
+        })
+        .catch(function (error) {
+          lastData = null;
+          document.getElementById("kuva2").innerHTML = "";
+          document.getElementById("kaannaAlue").innerHTML = "";
+          document.getElementById("nimi").innerHTML = "Pokemon ei löytynyt";
+          document.getElementById("vastaus").innerHTML = "<p>Tietoa ei pystytä hakemaan</p>";
+          document.getElementById("pokemonName").value = "";
+        });
+    }
+
+    function pokekuva(obj) {
+      const pokeurl = obj.sprites.front_default;
+
+      if (!pokeurl) {
+        document.getElementById("kuva2").innerHTML = "";
+        document.getElementById("nimi").innerHTML = "<b>" + name + "</b>";
+        document.getElementById("kaannaAlue").innerHTML = "";
+        document.getElementById("vastaus").innerHTML = "<p>Kuvaa ei löytynyt tälle Pokemonille</p>";
+        document.getElementById("pokemonName").value = "";
+        return;
+      }
+
+      document.getElementById("kuva2").innerHTML = "<img src='" + pokeurl + "' alt='Pokemon'>";
+      document.getElementById("nimi").innerHTML = "<b>" + name + "</b>";
+      document.getElementById("kaannaAlue").innerHTML = "<button onclick='kaanna()'>Käännä</button>";
+      document.getElementById("pokemonName").value = "";
+    }
+
+    function kaanna() {
+      document.getElementById("vastaus").innerHTML = "";
+
+      if (!lastData) {
+        document.getElementById("vastaus").innerHTML = "<p>Tietoa ei pystytä hakemaan</p>";
+        return;
+      }
+
+      const backUrl = lastData.sprites.back_default;
+
+      if (!backUrl) {
+        document.getElementById("vastaus").innerHTML = "<p>Selkäkuvaa ei löytynyt tälle Pokemonille</p>";
+        return;
+      }
+
+      document.getElementById("kuva2").innerHTML = "<img src='" + backUrl + "' alt='Pokemon selin'>";
+
+      const height = lastData.height;
+      const weight = lastData.weight;
+      const baseExp = lastData.base_experience;
+
+      let types = "";
+      if (lastData.types && lastData.types.length > 0) {
+        for (var i = 0; i < lastData.types.length; i++) {
+          types += lastData.types[i].type.name;
+          if (i < lastData.types.length - 1) types += ", ";
+        }
+      } else {
+        types = "-";
+      }
+
+      let out = "<h3>Ominaisuudet</h3>";
+      out += "<p><b>Tyyppi</b>: " + types + "</p>";
+      out += "<p><b>Pituus</b>: " + height + "</p>";
+      out += "<p><b>Paino</b>: " + weight + "</p>";
+      out += "<p><b>Base experience</b>: " + baseExp + "</p>";
+
+      document.getElementById("ominaisuudet").innerHTML = out;
+    }
+  </script>
+
+</body>
+</html>
