@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON-tehtävä</title>
+</head>
+<body>
 
+<h1>JSON-tehtävä</h1>
+
+<div id="vastaus"></div>
+
+<script>
+
+fetch("tietue.json")
+
+.then(function(response) {
+    return response.json();
+})
+
+.then(function(responseJson) {
+    kerro(responseJson);
+})
+
+.catch(function(error) {
+    document.getElementById("vastaus").innerHTML =
+        "<p>Tietoa ei pystytä hakemaan</p>";
+});
+
+function kerro(obj) {
+
+    let tiedot = "<h2>" + obj.otsikko + "</h2><br>"
+        + obj.kuvaus + "<br><hr>";
+
+    tiedot += "<p><img src='" + obj.kuva + "' width='300'></p>";
+
+    tiedot += "<h3>Opintojakso</h3>";
+    tiedot += "Nimi: " + obj.opintojakso.nimi + "<br>";
+    tiedot += "Tunnus: " + obj.opintojakso.tunnus + "<br>";
+    tiedot += "Opintopisteet: " + obj.opintojakso.opintopisteet + "<br>";
+
+    tiedot += "<h3>Aiheet</h3>";
+
+    for (var i = 0; i < obj.tekniikat.length; i++) {
+        tiedot += "<b>Aihe: " + obj.tekniikat[i].aihe + "</b> ";
+        tiedot += "<a href='" + obj.tekniikat[i].linkki + "' target='_blank'>";
+        tiedot += obj.tekniikat[i].linkki + "</a><br>";
+    }
+
+    document.getElementById("vastaus").innerHTML = tiedot;
+}
+
+</script>
+
+</body>
+</html>
