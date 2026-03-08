@@ -1,2 +1,2 @@
 # bootstrap-assigment
-Bootstrap assignment for Digitekniikat course
+Bootstrap assignment for "Digital tech" course
